@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>907665101363-be4c6rdtfvltkm2hrvdcqll7jpm6lc34.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.907665101363-be4c6rdtfvltkm2hrvdcqll7jpm6lc34</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>907665101363-tulsbsd352acg1e0f1jgndpei8rurket.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDzXpfDRfDcC0Pi63HufE_s2Ee7_pKoA_U</string>
+	<key>GCM_SENDER_ID</key>
+	<string>907665101363</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ww8007.ParkingApp</string>
+	<key>PROJECT_ID</key>
+	<string>parkingapp-bab3f</string>
+	<key>STORAGE_BUCKET</key>
+	<string>parkingapp-bab3f.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:907665101363:ios:91a30f750356c05c194946</string>
+	<key>DATABASE_URL</key>
+	<string>https://parkingapp-bab3f-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>
