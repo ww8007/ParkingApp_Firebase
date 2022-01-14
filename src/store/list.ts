@@ -15,10 +15,15 @@ const listSlice = createSlice({
 				status: 'send',
 				id: state.idxNumber,
 			};
+			state.idxNumber = state.idxNumber + 1;
 			state.timeList = [data, ...state.timeList];
 		},
 		removeList: (state, action: PayloadAction<number>) => {
-			state.timeList.filter((item) => item.id === action.payload);
+			console.log(action.payload);
+			console.log(state.timeList);
+			state.timeList = state.timeList.filter(
+				(item) => item.id !== action.payload
+			);
 		},
 	},
 });
