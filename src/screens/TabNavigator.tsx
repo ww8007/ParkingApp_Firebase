@@ -1,18 +1,19 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Colors } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import HomeNavigator from './HomeNavigator';
 import { Home } from './Home';
 import { RouteProp, ParamListBase } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { Platform } from 'react-native';
+import { Setting } from './Setting';
 type TabBarIconProps = { focused: boolean; color: string; size: number };
 
 const icons: Record<string, string[]> = {
-	Home: ['calendar-check', 'calendar-blank-outline'],
-	HomeNavigator: ['account-multiple', 'account-multiple-outline'],
+	Home: ['car', 'car-outline'],
+	Setting: ['ios-settings', 'ios-settings-outline'],
 };
 
 const screenOptions = ({
@@ -57,17 +58,17 @@ export default function TabNavigator() {
 					},
 				}}
 			/>
-			{/* <Tab.Screen
-				name="HomeNavigator"
-				component={HomeNavigator}
+			<Tab.Screen
+				name="Setting"
+				component={Setting}
 				options={{
-					tabBarLabel: '팀 페이지',
+					tabBarLabel: '설정',
 					tabBarLabelStyle: {
 						fontSize: 11,
 						fontFamily: 'NanumSquareBold',
 					},
 				}}
-			/> */}
+			/>
 		</Tab.Navigator>
 	);
 }
