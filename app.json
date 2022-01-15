@@ -1,34 +1,40 @@
 {
-  "expo": {
-    "name": "ParkingApp",
-    "slug": "ParkingApp",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.ww8007.ParkingApp"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "com.ww8007.ParkingApp"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
-  }
+	"expo": {
+		"name": "ParkingApp",
+		"slug": "ParkingApp",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.ww8007.ParkingApp",
+			"config": {
+				"googleSignIn": {
+					"reservedClientId": "com.googleusercontent.apps.907665101363-be4c6rdtfvltkm2hrvdcqll7jpm6lc34"
+				}
+			},
+			"googleServicesFile": "./ios/GoogleService-Info.plist",
+			"usesAppleSignIn": true
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#FFFFFF"
+			},
+			"package": "com.ww8007.ParkingApp",
+			"googleServicesFile": "./android/app/google-services.json"
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		}
+	}
 }
