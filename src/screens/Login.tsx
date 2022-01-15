@@ -26,16 +26,21 @@ import { interpolate } from '../lib/util/interpolate';
 import { TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-import { AppleLogin, GoogleLogin, GoogleLogin2 } from '../components';
+import { AppleLogin, GoogleLogin2, ModalAuth } from '../components';
+import { ModalRegister } from '../components/ModalRegister';
 
 dayjs.locale('ko');
 // import auth from '@react-native-firebase/auth';
 // import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export function Login() {
+	const { carNum } = useSelector(({ login }: RootState) => ({
+		carNum: login.carNum,
+	}));
+	const [modalVisible, setModalVisible] = useState(false);
 	const [socialModalVisible, setSocialModalVisible] = useState(false);
 	const [source, setSource] = useState('');
-
+	const [registerVisible, setRegister] = useState(false);
 	const navigation = useNavigation();
 	const AnimatedText = Animated.createAnimatedComponent(Text);
 	const [started, toggleStarted] = useToggle();
@@ -56,7 +61,13 @@ export function Login() {
 			),
 		[]
 	);
-
+	useEffect(() => {
+		setTimeout(() => {
+			if (carNum) {
+				navigation.navigate('TabNavigator');
+			}
+		}, 1000);
+	}, [carNum]);
 	const onPressGoHome = useCallback(() => {
 		navigation.navigate('TabNavigator');
 	}, []);
@@ -115,29 +126,40 @@ export function Login() {
 						</TouchableOpacity>
 
 						<>
-							{/* <TouchableOpacity
+							<TouchableOpacity
 								style={[
 									styles.touchableView,
 									{ backgroundColor: Colors.white },
 								]}
 								onPress={() => {
-									navigation.navigate('TabNavigator');
+									setModalVisible(true);
+									// navigation.navigate('TabNavigator');
 								}}
 							>
-								<Text style={styles.loginText}>카카오 로그인</Text>
-							</TouchableOpacity> */}
+								<Text style={styles.loginText}>이메일로 로그인</Text>
+							</TouchableOpacity>
 
 							{/* <GoogleLogin /> */}
 
 							{Platform.OS === 'ios' && <AppleLogin />}
 							<View style={{ height: 15 }} />
 							{/* <GoogleLogin /> */}
-							<GoogleLogin2 />
+							{/* <GoogleLogin2 /> */}
 							{/* {Platform.OS === 'ios' && <AppleLogin />} */}
 							<Text style={styles.buttonUnderText}>
 								카카오 계정으로 간편로그인 하세요.
 							</Text>
 							<Text>hihi</Text>
+							<ModalAuth
+								modalVisible={modalVisible}
+								setModalVisible={setModalVisible}
+								registerVisible={registerVisible}
+								setRegister={setRegister}
+							/>
+							<ModalRegister
+								modalVisible={registerVisible}
+								setModalVisible={setRegister}
+							/>
 							{/* <Text
 								style={{
 									position: 'absolute',
