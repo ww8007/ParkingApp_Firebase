@@ -20,7 +20,7 @@ import { ModalRegister } from './ModalRegister';
 import { useSetFireStore } from '../hooks';
 
 const screen = Dimensions.get('screen');
-const mainColor = '#33aafc';
+const mainColor = '#00B992';
 interface props {
 	modalVisible: boolean;
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -115,6 +115,7 @@ export function ModalAuth({
 								placeholder="EMAIL"
 								onChangeText={(email) => setEmail((text) => email)}
 								style={styles.loginText}
+								placeholderTextColor={Colors.grey600}
 							/>
 						</View>
 					</>
