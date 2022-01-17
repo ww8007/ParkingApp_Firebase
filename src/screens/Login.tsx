@@ -45,7 +45,7 @@ export function Login() {
 	const AnimatedText = Animated.createAnimatedComponent(Text);
 	const [started, toggleStarted] = useToggle();
 
-	const Title = useMemo(() => ['WE ', 'MEET'], []);
+	const Title = useMemo(() => ['JJ ', '탁구장'], []);
 	const animValues = useAnimatedValues(Title.length);
 	const [layout, setLayout] = useLayout();
 
@@ -113,7 +113,7 @@ export function Login() {
 
 	return (
 		<LinearGradient
-			colors={['#33aafc', '#017bff']}
+			colors={['#00B992', '#00B992']}
 			style={{ flex: 1 }}
 			end={{ x: 0.95, y: 0.95 }}
 			start={{ x: 0.01, y: 0.01 }}
@@ -138,18 +138,18 @@ export function Login() {
 							>
 								<Text style={styles.loginText}>이메일로 로그인</Text>
 							</TouchableOpacity>
-
+							<View style={{ height: 30 }} />
 							{/* <GoogleLogin /> */}
-
+							<View style={{ height: 30 }} />
 							{Platform.OS === 'ios' && <AppleLogin />}
-							<View style={{ height: 15 }} />
+
 							{/* <GoogleLogin /> */}
 							{/* <GoogleLogin2 /> */}
 							{/* {Platform.OS === 'ios' && <AppleLogin />} */}
-							<Text style={styles.buttonUnderText}>
+							{/* <Text style={styles.buttonUnderText}>
 								카카오 계정으로 간편로그인 하세요.
 							</Text>
-							<Text>hihi</Text>
+							<Text>hihi</Text> */}
 							<ModalAuth
 								modalVisible={modalVisible}
 								setModalVisible={setModalVisible}
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
 		fontFamily: 'NanumSquareBold',
 		fontSize: 20,
 		marginLeft: 10,
-		color: Colors.blue700,
+		color: '#008080',
 	},
 	keyboardAwareFocus: {
 		flex: 1,
