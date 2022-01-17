@@ -64,17 +64,27 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 	useEffect(() => {
 		if (mode === 'loading') {
 			const fireStore = getFirestore();
+			let carFullNum;
+			let carNumber;
+			carFullNum = carNum;
+			if (carNum.includes(' ')) {
+				carFullNum = carNum.replace(' ', '');
+			}
+			carNumber = carFullNum.slice(-4);
+			console.log('full', carFullNum, 'num', carNumber);
 			dispatch(setUserInfo({ name, carNum }));
 			const washingtonRef = doc(fireStore, 'user', `${email}`);
 			(async () => {
 				await updateDoc(washingtonRef, {
 					name: name,
-					carNum: carNum,
+					carFullNum: carFullNum,
+					carNum: carNumber,
+					id: '',
 				});
 			})();
 			setTimeout(() => setMode('finish'), 1000);
 		}
-	}, [mode, email]);
+	}, [mode, email, carNum, name]);
 
 	const onPressClose = useCallback(() => {
 		setModalVisible(false);
@@ -90,7 +100,7 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 				<>
 					<Sequence
 						item={item}
-						color={Colors.blue500}
+						color={'#00B992'}
 						currentNumber={currentNumber}
 					/>
 					<View style={styles.blankView} />
@@ -119,10 +129,12 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 					)}
 					{mode === 'carNum' && (
 						<>
-							<Text style={styles.titleText}>차량 번호를 입력해주세요</Text>
+							<Text style={styles.titleText}>
+								차량 번호를 띄어쓰기 없이 입력해주세요
+							</Text>
 							<View style={styles.blankView} />
 							<Text style={[styles.subText, { color: Colors.grey600 }]}>
-								예시 : 11가 1111
+								예시 : 11가1111
 							</Text>
 							<View style={styles.blankView} />
 							<View style={[styles.textInputView]}>
@@ -130,12 +142,12 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 									style={styles.textInput}
 									value={carNum}
 									onChangeText={(carNum) => setCarNum((text) => carNum)}
-									placeholder="11가 1111"
+									placeholder="11가1111"
 									placeholderTextColor={Colors.grey600}
 									autoFocus={true}
 								/>
 							</View>
-							<TouchableOpacity
+							{/* <TouchableOpacity
 								onPress={() => setCheckBox(!checkBox)}
 								style={{
 									flexDirection: 'row',
@@ -152,7 +164,7 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 								<Text style={[styles.touchText, { marginLeft: 0 }]}>
 									차량 번호 나중에 입력하기
 								</Text>
-							</TouchableOpacity>
+							</TouchableOpacity> */}
 							<View style={styles.buttonOverLine} />
 							<Button
 								buttonNumber={2}
@@ -177,7 +189,7 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 					{mode === 'finish' && (
 						<>
 							<View style={styles.blankView} />
-							<Text style={[styles.titleText]}>
+							<Text style={[styles.titleText, { fontSize: 17 }]}>
 								🎉 회원가입이 완료 되었습니다
 							</Text>
 							<View style={styles.blankView} />
