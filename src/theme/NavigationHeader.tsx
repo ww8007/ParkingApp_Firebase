@@ -31,7 +31,7 @@ export const NavigationHeader: FC<NavigationHeaderProps> = ({
 			style={[
 				styles.view,
 				viewStyle,
-				{ backgroundColor: headerColor ? headerColor : '#33aafc' },
+				{ backgroundColor: headerColor ? headerColor : '#00B992' },
 			]}
 		>
 			<View style={{ flex: 0.1, backgroundColor: 'transparent' }}></View>
