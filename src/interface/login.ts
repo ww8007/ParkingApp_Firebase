@@ -6,6 +6,7 @@ export interface login {
 	carNum: string;
 	name: string;
 	pushToken: string;
+	isSuperUser: boolean;
 }
 
 export interface serverInfo {
