@@ -13,7 +13,7 @@ import Ionic from 'react-native-vector-icons/Ionicons';
 import { RootState } from '../store';
 import { ModalSetting } from '../components';
 
-const mainColor = '#33aafc';
+const mainColor = '#00B992';
 
 export function Setting() {
 	const { name, carNum } = useSelector(({ login }: RootState) => ({
@@ -33,8 +33,8 @@ export function Setting() {
 	// }, []);
 
 	return (
-		<SafeAreaView style={{ backgroundColor: '#33aafc' }}>
-			<StatusBar style={'light'} backgroundColor="#33aafc" />
+		<SafeAreaView style={{ backgroundColor: '#00B992' }}>
+			<StatusBar style={'light'} backgroundColor="#00B992" />
 			<View style={styles.view}>
 				<NavigationHeader title="설정" />
 
@@ -53,7 +53,7 @@ export function Setting() {
 					<>
 						<View style={styles.rowView}>
 							<View style={[styles.iconStyle]}>
-								<Ionic name="car" size={28} color="#33aafc" />
+								<Ionic name="car" size={28} color={mainColor} />
 							</View>
 							<Text style={[styles.touchText, { marginLeft: 8 }]}>
 								차량 번호 : {carNum}
@@ -70,7 +70,7 @@ export function Setting() {
 					>
 						<View style={styles.rowView}>
 							<View style={styles.iconStyle}>
-								<Material name="clock" size={27} color="#33aafc" />
+								<Material name="clock" size={27} color={mainColor} />
 							</View>
 							<Text style={styles.touchText}>차량 번호 수정</Text>
 							<View style={styles.iconView}>
@@ -105,13 +105,13 @@ const styles = StyleSheet.create({
 	},
 	touchView: {
 		marginTop: 10,
-		backgroundColor: Colors.blue400,
+		backgroundColor: '#00B992',
 	},
 	titleText: {
 		fontSize: 20,
 		alignSelf: 'flex-start',
 		fontFamily: 'NanumSquareBold',
-		marginLeft: 15,
+		marginLeft: '10%',
 		marginTop: 20,
 		letterSpacing: -1,
 	},
@@ -125,14 +125,13 @@ const styles = StyleSheet.create({
 		padding: 5,
 	},
 	iconStyle: {
-		marginLeft: 10,
-
 		height: 30,
 		width: 30,
-		marginTop: 3,
+
 		alignSelf: 'center',
 		justifyContent: 'center',
 		alignItems: 'center',
+		marginLeft: '9%',
 	},
 	touchText: {
 		fontSize: 14,
@@ -149,7 +148,7 @@ const styles = StyleSheet.create({
 		flex: 1.5,
 	},
 	rightIconStyle: {
-		marginRight: 10,
+		marginRight: '15%',
 	},
 	blankGreyView: {
 		height: 20,
