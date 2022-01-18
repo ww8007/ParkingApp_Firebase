@@ -10,14 +10,18 @@ import {
 } from 'react-native';
 
 import { Button, ModalView } from '../theme';
-import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+// import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
+// import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { setUid } from '../store/login';
+import { setUid, setUserInfo } from '../store/login';
 import { ModalRegister } from './ModalRegister';
-import { useSetFireStore } from '../hooks';
+// import { useSetFireStore } from '../hooks';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import { setCarNum } from '../store/car';
+import { useNavigation } from '@react-navigation/native';
 
 const screen = Dimensions.get('screen');
 const mainColor = '#00B992';
@@ -40,9 +44,11 @@ export function ModalAuth({
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const dispatch = useDispatch();
-	const auth = getAuth();
+
+	const navigation = useNavigation();
 	const register = async () =>
-		createUserWithEmailAndPassword(auth, email, password)
+		auth()
+			.createUserWithEmailAndPassword(email, password)
 			.then((userCredential) => {
 				// Signed in
 				const user = userCredential.user;
@@ -53,9 +59,15 @@ export function ModalAuth({
 					setModalVisible(false);
 					setRegister(true);
 					const data = {
-						udi: uid,
+						uid: uid,
 					};
-					useSetFireStore(data);
+					firestore()
+						.collection('user')
+						.doc(`${email}`)
+						.update(data)
+						.then(() => {
+							console.log('User updated!');
+						});
 				}
 				// ...
 			})
@@ -66,7 +78,8 @@ export function ModalAuth({
 				// ..
 			});
 	const login = async () =>
-		signInWithEmailAndPassword(auth, email, password)
+		auth()
+			.signInWithEmailAndPassword(email, password)
 			.then((userCredential) => {
 				// Signed in
 				const user = userCredential.user;
@@ -75,11 +88,32 @@ export function ModalAuth({
 					dispatch(setUid({ email, uid }));
 					console.log('hi');
 					setModalVisible(false);
-					setRegister(true);
+
 					const data = {
-						udi: uid,
+						uid: uid,
 					};
-					useSetFireStore(data);
+					firestore()
+						.collection('user')
+						.doc(`${email}`)
+						.update(data)
+						.then(() => {
+							console.log('User updated!');
+						});
+					firestore()
+						.collection('user')
+						.doc(email)
+						.onSnapshot((documentSnapshot) => {
+							const data = documentSnapshot.data();
+							if (data) {
+								const { carFullNum, carNum, name } = data;
+								console.log(carNum, 'carNum');
+								dispatch(setUserInfo({ name, carNum }));
+							}
+							console.log('User data: ', documentSnapshot.data());
+						});
+					setTimeout(() => {
+						navigation.navigate('TabNavigator');
+					}, 500);
 				}
 				// ...
 			})
@@ -87,6 +121,9 @@ export function ModalAuth({
 				const errorCode = error.code;
 				const errorMessage = error.message;
 				console.warn(errorCode);
+				if (error.code === 'auth/email-already-in-use') {
+					Alert.alert('이미 가입된 이메일 입니다');
+				}
 				if (errorCode === 'auth/wrong-password') {
 					Alert.alert('아이디/비밀번호 오류');
 				}
