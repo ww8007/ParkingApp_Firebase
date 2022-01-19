@@ -1,15 +1,12 @@
 {
 	"expo": {
-		"name": "ParkingApp",
+		"name": "Parking App",
 		"slug": "ParkingApp",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
+		"userInterfaceStyle": "automatic",
+		"scheme": "exp+wemeet",
 		"updates": {
 			"fallbackToCacheTimeout": 0
 		},
@@ -35,6 +32,8 @@
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
-		}
+		},
+		"description": "",
+		"scheme": "exp+wemeet"
 	}
 }
