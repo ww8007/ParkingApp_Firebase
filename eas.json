@@ -1,6 +1,6 @@
 {
 	"cli": {
-		"version": ">= 0.28.0"
+		"version": ">= 0.38.0"
 	},
 	"build": {
 		"development": {
@@ -9,8 +9,12 @@
 		},
 		"preview": {
 			"distribution": "internal",
-			"developmentClient": true
+			"developmentClient": true,
+			"ios": {
+				"cocoapods": "1.10.2"
+			}
 		},
+
 		"production": {}
 	},
 	"submit": {
