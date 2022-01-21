@@ -10,12 +10,10 @@ import {
 } from 'react-native';
 
 import { Button, ModalView } from '../theme';
-// import { Auth, signInWithEmailAndPassword } from 'firebase/auth';
-// import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Colors } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
-import { setUid, setUserInfo } from '../store/login';
+import { setAdmin, setUid, setUserInfo } from '../store/login';
 import { ModalRegister } from './ModalRegister';
 // import { useSetFireStore } from '../hooks';
 import auth from '@react-native-firebase/auth';
@@ -37,7 +35,7 @@ export function ModalAuth({
 	setModalVisible,
 	setRegister,
 }: props) {
-	const [mode, setMode] = useState(false);
+	const [mode, setMode] = useState(true);
 
 	// Set an initializing state whilst Firebase connects
 
@@ -45,8 +43,19 @@ export function ModalAuth({
 	const [password, setPassword] = useState('');
 	const dispatch = useDispatch();
 
+	const reset = async () => {
+		if (email === '') {
+			Alert.alert('이메일을 입력해주세요');
+		} else {
+			Alert.alert('입력하신 이메일로 비밀번호 재설정 링크가 전송 되었습니다');
+			auth().sendPasswordResetEmail(email);
+		}
+	};
+
 	const navigation = useNavigation();
-	const register = async () =>
+	const register = async () => {
+		setEmail(email.replace(' ', ''));
+		setPassword(password.replace('', ''));
 		auth()
 			.createUserWithEmailAndPassword(email, password)
 			.then((userCredential) => {
@@ -60,11 +69,12 @@ export function ModalAuth({
 					setRegister(true);
 					const data = {
 						uid: uid,
+						admin: false,
 					};
 					firestore()
 						.collection('user')
 						.doc(`${email}`)
-						.update(data)
+						.set(data)
 						.then(() => {
 							console.log('User updated!');
 						});
@@ -77,7 +87,10 @@ export function ModalAuth({
 				console.warn(errorMessage);
 				// ..
 			});
-	const login = async () =>
+	};
+	const login = async () => {
+		setEmail(email.replace(' ', ''));
+		setPassword(password.replace('', ''));
 		auth()
 			.signInWithEmailAndPassword(email, password)
 			.then((userCredential) => {
@@ -91,23 +104,29 @@ export function ModalAuth({
 
 					const data = {
 						uid: uid,
+						email: email,
 					};
+					console.log(firestore().app.auth().currentUser?.uid);
 					firestore()
 						.collection('user')
 						.doc(`${email}`)
 						.update(data)
 						.then(() => {
 							console.log('User updated!');
-						});
+						})
+						.catch((e) => console.log(e));
 					firestore()
 						.collection('user')
 						.doc(email)
 						.onSnapshot((documentSnapshot) => {
 							const data = documentSnapshot.data();
 							if (data) {
-								const { carFullNum, carNum, name } = data;
+								const { carNum, name, admin } = data;
 								console.log(carNum, 'carNum');
 								dispatch(setUserInfo({ name, carNum }));
+								if (admin === true) {
+									dispatch(setAdmin(true));
+								}
 							}
 							console.log('User data: ', documentSnapshot.data());
 						});
@@ -125,9 +144,13 @@ export function ModalAuth({
 					Alert.alert('이미 가입된 이메일 입니다');
 				}
 				if (errorCode === 'auth/wrong-password') {
-					Alert.alert('아이디/비밀번호 오류');
+					Alert.alert('비밀번호 오류');
+				}
+				if (errorCode === 'auth/user-not-found') {
+					Alert.alert('이메일이 잘못되었습니다');
 				}
 			});
+	};
 	return (
 		<ModalView
 			modalVisible={modalVisible}
@@ -187,6 +210,13 @@ export function ModalAuth({
 							</Text>
 						</TouchableOpacity>
 					</View>
+					{mode === false && (
+						<View style={[styles.buttonView, { marginTop: 10 }]}>
+							<TouchableOpacity onPress={reset}>
+								<Text style={styles.buttonText}>비밀번호 재설정</Text>
+							</TouchableOpacity>
+						</View>
+					)}
 					<View style={styles.buttonOverLine} />
 					<Button
 						buttonText={mode ? '회원가입' : '로그인'}
@@ -233,17 +263,16 @@ const styles = StyleSheet.create({
 	},
 	buttonView: {
 		alignSelf: 'flex-end',
-		paddingLeft: 5,
-		paddingRight: 5,
+
 		paddingTop: 5,
+		borderBottomWidth: 0.4,
 	},
 	buttonText: {
-		borderBottomWidth: 0.5,
-
 		fontSize: 12,
-		marginRight: 10,
+		alignSelf: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
+		textAlign: 'center',
 	},
 	loginText: {
 		fontFamily: 'NanumSquareR',
