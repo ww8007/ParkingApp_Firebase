@@ -34,7 +34,5 @@
 	<string>1:907665101363:ios:91a30f750356c05c194946</string>
 	<key>DATABASE_URL</key>
 	<string>https://parkingapp-bab3f-default-rtdb.firebaseio.com</string>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<false></false>
 </dict>
 </plist>
