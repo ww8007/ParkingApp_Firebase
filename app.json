@@ -1,12 +1,11 @@
 {
 	"expo": {
-		"name": "Parking App",
+		"name": "JJ 탁구장",
 		"slug": "ParkingApp",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "automatic",
-		"scheme": "exp+wemeet",
 		"updates": {
 			"fallbackToCacheTimeout": 0
 		},
@@ -23,17 +22,12 @@
 			"usesAppleSignIn": true
 		},
 		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
-				"backgroundColor": "#FFFFFF"
-			},
 			"package": "com.ww8007.ParkingApp",
 			"googleServicesFile": "./android/app/google-services.json"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
 		},
-		"description": "",
-		"scheme": "exp+wemeet"
+		"description": ""
 	}
 }
