@@ -1456,7 +1456,7 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/in-app-messaging/-/in-app-messaging-14.2.2.tgz#b41ee83a333d75df65355408a5ba62d4152fb274"
   integrity sha512-xE8TWtSHVcSHbTbAX2YsaLkRBvA50day2kVmYofIAY3if4vaThj7jxCKgUngN/PI3goeophUOnFKWiWLE/QMhA==
 
-"@react-native-firebase/messaging@^14.2.3":
+"@react-native-firebase/messaging@^14.2.2":
   version "14.2.3"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-14.2.3.tgz#8cbef6dc29ffcc9d31adfdc7b8b82666d0015ae4"
   integrity sha512-/d5ZGCWvIFJ8HS7gzpLUYIXevOGSrH6NaHaQJSVl0pus19E9aC9WMb2GJANtCGXD+/XmXz2c7amUTNgrteCgVQ==
