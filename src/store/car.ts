@@ -7,6 +7,7 @@ import * as api from '../lib/api/car';
 import createRequestSaga from '../lib/util/createRequestSaga';
 import { takeLatest } from 'redux-saga/effects';
 import type { car, postDiscountAPI } from '../interface/car';
+import { Alert } from 'react-native';
 
 const GET_CARLIST = 'car/GET_CARLIST';
 const GET_CARINFO = 'car/GET_CARINFO';
@@ -54,6 +55,7 @@ const initialState: car = {
 	carNum: '',
 	isCarGetSuccess: false,
 	isPostSuccess: false,
+	isRequestCarNum: false,
 };
 
 const carSlice = createSlice({
@@ -73,14 +75,21 @@ const carSlice = createSlice({
 			const find = state.carList.find(
 				(car: carType) => car.carNo === state.carNum
 			);
-
-			const { entryDate, id, entryDateToString, differentTime } = find;
-			if (entryDate && id) {
-				state.carInfo.differentTime = differentTime;
-				state.carInfo.id = id;
-				state.carInfo.entryDate = entryDate;
-				state.carInfo.entryDateString = entryDateToString;
+			console.log(state.carList);
+			if (!find) {
+				Alert.alert('경고', '차량 번호가 잘못되었습니다');
+				state.isRequestCarNum = true;
+			} else {
+				state.isRequestCarNum = false;
+				const { entryDate, id, entryDateToString, differentTime } = find;
+				if (entryDate && id) {
+					state.carInfo.differentTime = differentTime;
+					state.carInfo.id = id;
+					state.carInfo.entryDate = entryDate;
+					state.carInfo.entryDateString = entryDateToString;
+				}
 			}
+
 			state.isCarGetSuccess = true;
 		},
 		GET_CARLIST_FAILURE: (state, action: PayloadAction<any>) => {
@@ -114,10 +123,13 @@ const carSlice = createSlice({
 		setCarId: (state, action: PayloadAction<string>) => {
 			state.carInfo.id = action.payload;
 		},
+		makePostSuccess: (state, action: PayloadAction<boolean>) => {
+			state.isPostSuccess = action.payload;
+		},
 	},
 });
 
-export const { setCarNum, setCarId } = carSlice.actions;
+export const { setCarNum, setCarId, makePostSuccess } = carSlice.actions;
 
 export default carSlice.reducer;
 
