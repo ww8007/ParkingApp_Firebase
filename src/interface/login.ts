@@ -7,6 +7,7 @@ export interface login {
 	name: string;
 	pushToken: string;
 	isSuperUser: boolean;
+	superUserTokens: string[];
 }
 
 export interface serverInfo {
