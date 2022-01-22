@@ -6,6 +6,7 @@ export interface car {
 	carInfo: carInfo;
 	isCarGetSuccess: boolean;
 	isPostSuccess: boolean;
+	isRequestCarNum: boolean;
 }
 
 interface carInfo {
@@ -33,4 +34,5 @@ export interface carInfoState {
 	hour: string;
 	timeStamp: string;
 	name: string;
+	pushToken: string;
 }
