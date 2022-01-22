@@ -14,14 +14,8 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import {
-	doc,
-	getFirestore,
-	setDoc,
-	collection,
-	addDoc,
-	updateDoc,
-} from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
+
 import { setUserInfo } from '../store/login';
 import car from '../store/car';
 import { useNavigation } from '@react-navigation/native';
@@ -38,15 +32,15 @@ export function ModalSetting({
 	modalVisible,
 	currentCarNum,
 }: props) {
-	const { email } = useSelector(({ login }: RootState) => ({
+	const { email, name } = useSelector(({ login }: RootState) => ({
 		email: login.email,
+		name: login.name,
 	}));
 
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 
 	const [mode, setMode] = useState('initial');
-	const [name, setName] = useState('');
 	const [carNum, setCarNum] = useState('');
 	const [checkBox, setCheckBox] = useState(false);
 
@@ -59,17 +53,19 @@ export function ModalSetting({
 
 	useEffect(() => {
 		if (mode === 'loading') {
-			const fireStore = getFirestore();
-			dispatch(setUserInfo({ name, carNum }));
-			const washingtonRef = doc(fireStore, 'user', `${email}`);
-			(async () => {
-				await updateDoc(washingtonRef, {
+			dispatch(setUserInfo({ name: name, carNum }));
+			firestore()
+				.collection('user')
+				.doc(`${email}`)
+				.update({
 					carNum: carNum,
+				})
+				.then(() => {
+					console.log('User updated!');
 				});
-			})();
 			setTimeout(() => setMode('finish'), 1000);
 		}
-	}, [mode, email]);
+	}, [mode, email, name]);
 
 	const onPressClose = useCallback(() => {
 		setModalVisible(false);
@@ -135,9 +131,9 @@ export function ModalSetting({
 					)}
 					{mode === 'finish' && (
 						<>
-							<View style={styles.blankView} />
+							{/* <View style={styles.blankView} /> */}
 							<Text style={[styles.titleText]}>
-								🎉 회원가입이 완료 되었습니다
+								✅ 변경사항이 저장 되었습니다
 							</Text>
 							<View style={styles.blankView} />
 							<View style={styles.buttonOverLine} />
@@ -172,7 +168,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 	titleText: {
-		fontSize: 20,
+		fontSize: 18,
 		alignSelf: 'center',
 		fontFamily: 'NanumSquareBold',
 		letterSpacing: -1,
