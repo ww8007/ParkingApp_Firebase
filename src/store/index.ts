@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { all } from 'redux-saga/effects';
 import { persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import login, { loginSaga } from './login';
+import login from './login';
 import car, { carSaga } from './car';
 import list from './list';
 // import storageSession from 'redux-persist/lib/storage/session';
@@ -16,5 +16,5 @@ export default persistReducer(persistConfig, rootReducer);
 export type RootState = ReturnType<typeof rootReducer>;
 
 export function* rootSaga() {
-	yield all([loginSaga(), carSaga()]);
+	yield all([carSaga()]);
 }
