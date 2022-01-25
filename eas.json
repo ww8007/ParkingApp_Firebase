@@ -4,7 +4,10 @@
 	},
 	"build": {
 		"development": {
-			"distribution": "internal"
+			"distribution": "internal",
+			"ios": {
+				"cocoapods": "1.10.2"
+			}
 		},
 		"preview": {
 			"distribution": "internal",
