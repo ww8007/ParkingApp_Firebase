@@ -14,14 +14,8 @@ import Material from 'react-native-vector-icons/MaterialIcons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import {
-	doc,
-	getFirestore,
-	setDoc,
-	collection,
-	addDoc,
-	updateDoc,
-} from 'firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
+
 import { setUserInfo } from '../store/login';
 import car from '../store/car';
 import { useNavigation } from '@react-navigation/native';
@@ -63,25 +57,22 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 
 	useEffect(() => {
 		if (mode === 'loading') {
-			const fireStore = getFirestore();
-			let carFullNum;
+			// const fireStore = getFirestore();
 			let carNumber;
-			carFullNum = carNum;
-			if (carNum.includes(' ')) {
-				carFullNum = carNum.replace(' ', '');
-			}
-			carNumber = carFullNum.slice(-4);
-			console.log('full', carFullNum, 'num', carNumber);
+			carNumber = carNum.replace(' ', '');
+			setCarNum(carNum.replace(' ', ''));
 			dispatch(setUserInfo({ name, carNum }));
-			const washingtonRef = doc(fireStore, 'user', `${email}`);
-			(async () => {
-				await updateDoc(washingtonRef, {
+			firestore()
+				.collection('user')
+				.doc(`${email}`)
+				.update({
 					name: name,
-					carFullNum: carFullNum,
 					carNum: carNumber,
 					id: '',
+				})
+				.then(() => {
+					console.log('User updated!');
 				});
-			})();
 			setTimeout(() => setMode('finish'), 1000);
 		}
 	}, [mode, email, carNum, name]);
@@ -179,7 +170,7 @@ export function ModalRegister({ setModalVisible, modalVisible }: props) {
 					)}
 					{mode === 'loading' && (
 						<>
-							<ActivityIndicator size={30} />
+							<ActivityIndicator color="#00B992" size={30} />
 							<View style={styles.blankView} />
 							<Text style={[styles.titleText, { color: Colors.grey600 }]}>
 								로딩중
