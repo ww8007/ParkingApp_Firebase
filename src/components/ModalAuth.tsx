@@ -20,6 +20,18 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { setCarNum } from '../store/car';
 import { useNavigation } from '@react-navigation/native';
+import DropDownPicker, { ValueType } from 'react-native-dropdown-picker';
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+
+const data = [
+	{ label: '@naver.com', value: '@naver.com' },
+	{ label: '@google.com', value: '@google.com' },
+	{ label: '@hanmail.ent', value: '@hanmail.net' },
+	{ label: '@nate.com', value: '@nate.com' },
+	{ label: '@yahoo.com', value: '@yahoo.com' },
+	{ label: '@kakao.com', value: '@kakao.com' },
+];
 
 const screen = Dimensions.get('screen');
 const mainColor = '#00B992';
@@ -41,7 +53,13 @@ export function ModalAuth({
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [value, setValue] = useState(null);
+	const [isFocus, setIsFocus] = useState(false);
 	const dispatch = useDispatch();
+
+	useEffect(() => {
+		console.log(value);
+	}, [value]);
 
 	const reset = async () => {
 		if (email === '') {
@@ -54,10 +72,14 @@ export function ModalAuth({
 
 	const navigation = useNavigation();
 	const register = async () => {
+		let fixEmail = email.replace(' ', '');
+		fixEmail = fixEmail + value;
 		setEmail(email.replace(' ', ''));
+		setEmail(email + value);
+
 		setPassword(password.replace('', ''));
 		auth()
-			.createUserWithEmailAndPassword(email, password)
+			.createUserWithEmailAndPassword(fixEmail, password)
 			.then((userCredential) => {
 				// Signed in
 				const user = userCredential.user;
@@ -71,6 +93,7 @@ export function ModalAuth({
 						uid: uid,
 						admin: false,
 					};
+					dispatch(setAdmin(false));
 					firestore()
 						.collection('user')
 						.doc(`${email}`)
@@ -85,14 +108,23 @@ export function ModalAuth({
 				const errorCode = error.code;
 				const errorMessage = error.message;
 				console.warn(errorMessage);
-				// ..
-			});
+				if (error.code === 'auth/email-already-in-use') {
+					Alert.alert('이미 가입된 이메일 입니다');
+				}
+			})
+			.then();
+		auth().signInWithEmailAndPassword(email, password);
 	};
 	const login = async () => {
+		let fixEmail = email.replace(' ', '');
+		fixEmail = fixEmail + value;
+		console.log(fixEmail);
 		setEmail(email.replace(' ', ''));
 		setPassword(password.replace('', ''));
+
+		console.log(email);
 		auth()
-			.signInWithEmailAndPassword(email, password)
+			.signInWithEmailAndPassword(fixEmail, password)
 			.then((userCredential) => {
 				// Signed in
 				const user = userCredential.user;
@@ -104,12 +136,12 @@ export function ModalAuth({
 
 					const data = {
 						uid: uid,
-						email: email,
+						email: fixEmail,
 					};
 					console.log(firestore().app.auth().currentUser?.uid);
 					firestore()
 						.collection('user')
-						.doc(`${email}`)
+						.doc(`${fixEmail}`)
 						.update(data)
 						.then(() => {
 							console.log('User updated!');
@@ -117,7 +149,7 @@ export function ModalAuth({
 						.catch((e) => console.log(e));
 					firestore()
 						.collection('user')
-						.doc(email)
+						.doc(fixEmail)
 						.onSnapshot((documentSnapshot) => {
 							const data = documentSnapshot.data();
 							if (data) {
@@ -161,11 +193,11 @@ export function ModalAuth({
 						<View style={styles.textInputView}>
 							<Icon
 								name="account"
-								size={25}
+								size={30}
 								color={mainColor}
 								style={{
 									// marginTop: 5,
-									paddingRight: 10,
+									paddingRight: 5,
 								}}
 							/>
 							<TextInput
@@ -174,8 +206,37 @@ export function ModalAuth({
 								autoCompleteType="email"
 								placeholder="EMAIL"
 								onChangeText={(email) => setEmail((text) => email)}
-								style={styles.loginText}
+								style={[styles.loginText]}
 								placeholderTextColor={Colors.grey600}
+							/>
+
+							{/* {renderLabel()} */}
+							<Dropdown
+								style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+								placeholderStyle={styles.placeholderStyle}
+								selectedTextStyle={styles.selectedTextStyle}
+								inputSearchStyle={styles.inputSearchStyle}
+								iconStyle={styles.iconStyle}
+								data={data}
+								maxHeight={300}
+								labelField="label"
+								valueField="value"
+								placeholder={!isFocus ? '이메일 선택' : '...'}
+								value={value}
+								onFocus={() => setIsFocus(true)}
+								onBlur={() => setIsFocus(false)}
+								onChange={(item) => {
+									setValue(item.value);
+									setIsFocus(false);
+								}}
+								// renderLeftIcon={() => (
+								// 	<AntDesign
+								// 		style={styles.icon}
+								// 		color={isFocus ? 'blue' : 'black'}
+								// 		name="Safety"
+								// 		size={20}
+								// 	/>
+								// )}
 							/>
 						</View>
 					</>
@@ -184,11 +245,11 @@ export function ModalAuth({
 						<View style={styles.textInputView}>
 							<Icon
 								name="lock"
-								size={25}
+								size={30}
 								color={mainColor}
 								style={{
 									// marginTop: 5,
-									paddingRight: 10,
+									paddingRight: 5,
 								}}
 							/>
 							<TextInput
@@ -232,8 +293,8 @@ export function ModalAuth({
 const styles = StyleSheet.create({
 	textInputView: {
 		paddingBottom: 2,
-		borderBottomWidth: 0.6,
-		width: '60%',
+		// borderBottomWidth: 0.6,
+		width: '80%',
 		justifyContent: 'flex-start',
 		textAlign: 'center',
 
@@ -264,7 +325,7 @@ const styles = StyleSheet.create({
 	buttonView: {
 		alignSelf: 'flex-end',
 
-		paddingTop: 5,
+		// paddingTop: 5,
 		borderBottomWidth: 0.4,
 	},
 	buttonText: {
@@ -277,8 +338,53 @@ const styles = StyleSheet.create({
 	loginText: {
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		fontSize: 14,
-		width: '100%',
+		fontSize: 13,
+		flex: 1,
 		color: Colors.black,
+		height: 35,
+		width: '100%',
+		borderWidth: 0.4,
+		borderRadius: 8,
+		paddingLeft: 10,
+	},
+	container: {
+		backgroundColor: 'white',
+		padding: 16,
+	},
+	dropdown: {
+		height: 35,
+		borderColor: 'gray',
+		borderWidth: 0.5,
+		borderRadius: 8,
+		width: 120,
+		paddingHorizontal: 8,
+	},
+	icon: {
+		marginRight: 5,
+	},
+	label: {
+		position: 'absolute',
+		backgroundColor: 'white',
+		left: 22,
+		top: 8,
+		zIndex: 999,
+		paddingHorizontal: 8,
+		fontSize: 14,
+	},
+	placeholderStyle: {
+		fontSize: 13,
+		fontFamily: 'NanumSquareR',
+	},
+	selectedTextStyle: {
+		fontSize: 13,
+		fontFamily: 'NanumSquareR',
+	},
+	iconStyle: {
+		width: 20,
+		height: 20,
+	},
+	inputSearchStyle: {
+		height: 40,
+		fontSize: 16,
 	},
 });
