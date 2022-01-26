@@ -9,14 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from '../theme';
-// import { SocialWebviewModal } from './Login/SocialWebviewModal';
 import { LinearGradient } from 'expo-linear-gradient';
-// import {
-// 	SafeAreaView,
-// 	TouchableView,
-// 	MaterialCommunityIcon as Icon,
-// } from '../theme/navigation';
-import { getDatabase, ref, onValue, set } from 'firebase/database';
 import { Colors } from 'react-native-paper';
 import { RootState } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,12 +19,10 @@ import { interpolate } from '../lib/util/interpolate';
 import { TouchableOpacity } from 'react-native';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-import { AppleLogin, GoogleLogin2, ModalAuth } from '../components';
+import { ModalAuth } from '../components';
 import { ModalRegister } from '../components/ModalRegister';
 
 dayjs.locale('ko');
-// import auth from '@react-native-firebase/auth';
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export function Login() {
 	const { carNum } = useSelector(({ login }: RootState) => ({
@@ -68,20 +59,6 @@ export function Login() {
 			}
 		}, 1000);
 	}, [carNum]);
-	const onPressGoHome = useCallback(() => {
-		navigation.navigate('TabNavigator');
-	}, []);
-
-	// const endAnimations = useMemo(
-	// 	() =>
-	// 		Title.map((notUsed, index) =>
-	// 			Animated.spring(animValues[index], {
-	// 				useNativeDriver: true,
-	// 				toValue: 0,
-	// 			})
-	// 		),
-	// 	[]
-	// );
 	const appLoading = useCallback(() => {
 		if (Platform.OS === 'ios')
 			Animated.stagger(600, [...startAnimations]).start(toggleStarted);
@@ -126,30 +103,24 @@ export function Login() {
 						</TouchableOpacity>
 
 						<>
-							<TouchableOpacity
-								style={[
-									styles.touchableView,
-									{ backgroundColor: Colors.white },
-								]}
-								onPress={() => {
-									setModalVisible(true);
-									// navigation.navigate('TabNavigator');
-								}}
-							>
-								<Text style={styles.loginText}>이메일로 로그인</Text>
-							</TouchableOpacity>
-							<View style={{ height: 30 }} />
-							{/* <GoogleLogin /> */}
-							<View style={{ height: 30 }} />
-							{Platform.OS === 'ios' && <AppleLogin />}
-
-							{/* <GoogleLogin /> */}
-							{/* <GoogleLogin2 /> */}
-							{/* {Platform.OS === 'ios' && <AppleLogin />} */}
-							{/* <Text style={styles.buttonUnderText}>
-								카카오 계정으로 간편로그인 하세요.
-							</Text>
-							<Text>hihi</Text> */}
+							{carNum === '' && (
+								<>
+									<TouchableOpacity
+										style={[
+											styles.touchableView,
+											{ backgroundColor: Colors.white },
+										]}
+										onPress={() => {
+											setModalVisible(true);
+											// navigation.navigate('TabNavigator');
+										}}
+									>
+										<Text style={styles.loginText}>이메일로 로그인</Text>
+									</TouchableOpacity>
+									<View style={{ height: 30 }} />
+									<View style={{ height: 30 }} />
+								</>
+							)}
 							<ModalAuth
 								modalVisible={modalVisible}
 								setModalVisible={setModalVisible}
@@ -160,17 +131,6 @@ export function Login() {
 								modalVisible={registerVisible}
 								setModalVisible={setRegister}
 							/>
-							{/* <Text
-								style={{
-									position: 'absolute',
-									bottom: 0,
-									color: Colors.white,
-									fontSize: 11,
-									fontFamily: 'SCDream4',
-								}}
-							>
-								make your plan
-							</Text> */}
 						</>
 					</View>
 				</ScrollView>
