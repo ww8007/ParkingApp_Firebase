@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { NavigationHeader, SafeAreaView } from '../theme';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -31,6 +31,9 @@ export function Setting() {
 	// const onPressLogin = useCallback(() => {
 	// 	dispatch(getLogin());
 	// }, []);
+	const onClickOpenChat = useCallback(() => {
+		Linking.openURL('https://open.kakao.com/o/sJiIJAVd');
+	}, []);
 
 	return (
 		<SafeAreaView style={{ backgroundColor: '#00B992' }}>
@@ -83,7 +86,29 @@ export function Setting() {
 							</View>
 						</View>
 					</TouchableOpacity>
+					<View style={styles.blankGreyView} />
+					<Text style={styles.titleText}>문의하기</Text>
+
 					<View style={styles.blankView} />
+					<TouchableOpacity activeOpacity={0.5} onPress={onClickOpenChat}>
+						<View style={styles.rowView}>
+							<Ionic
+								name="chatbubble-sharp"
+								size={25}
+								color={mainColor}
+								style={[styles.iconStyle, { marginLeft: '10%' }]}
+							/>
+							<Text style={styles.touchText}>카카오톡 </Text>
+							<View style={styles.iconView}>
+								<Font5Icon
+									name="angle-right"
+									size={19}
+									color={Colors.black}
+									style={styles.rightIconStyle}
+								/>
+							</View>
+						</View>
+					</TouchableOpacity>
 				</View>
 				<ModalSetting
 					modalVisible={modalVisible}
