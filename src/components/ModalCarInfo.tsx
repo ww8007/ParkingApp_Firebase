@@ -7,30 +7,26 @@ import {
 	TextInput,
 	View,
 	Dimensions,
+	Alert,
 } from 'react-native';
 import { ActivityIndicator, Colors } from 'react-native-paper';
 import { Button, ModalView, Sequence } from '../theme';
 import Material from 'react-native-vector-icons/MaterialIcons';
-import {
-	TouchableHighlight,
-	TouchableOpacity,
-} from 'react-native-gesture-handler';
+import database from '@react-native-firebase/database';
+import { TouchableHighlight, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import {
-	doc,
-	getFirestore,
-	setDoc,
-	collection,
-	addDoc,
-	updateDoc,
-	getDoc,
-} from 'firebase/firestore';
+
 import { setUserInfo } from '../store/login';
-import car, { getCarList, setCarId, setCarNum } from '../store/car';
+import car, {
+	getCarList,
+	makePostSuccess,
+	setCarId,
+	setCarNum,
+} from '../store/car';
 import { useNavigation } from '@react-navigation/native';
 import { carInfoState } from '../interface/car';
-import { useSetFireStore } from '../hooks';
+
 import { is } from 'immer/dist/internal';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
@@ -43,6 +39,10 @@ const UNDER_3 = 1;
 const UNDER_5 = 4;
 const OVER_5 = 6;
 
+import firestore from '@react-native-firebase/firestore';
+import { sendPushNotification } from '.';
+import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+
 interface props {
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 	modalVisible: boolean;
@@ -54,43 +54,42 @@ export function ModalCarInfo({
 	modalVisible,
 	carInfo,
 }: props) {
-	const { email, isCarGetSuccess, carServerInfo, isPostSuccess } = useSelector(
-		({ login, car }: RootState) => ({
-			email: login.email,
-			isCarGetSuccess: car.isCarGetSuccess,
-
-			carServerInfo: car.carInfo,
-			isPostSuccess: car.isCarGetSuccess,
-		})
-	);
+	const {
+		email,
+		isCarGetSuccess,
+		carServerInfo,
+		isPostSuccess,
+		isRequestCarNum,
+	} = useSelector(({ login, car }: RootState) => ({
+		email: login.email,
+		isCarGetSuccess: car.isCarGetSuccess,
+		carServerInfo: car.carInfo,
+		isPostSuccess: car.isPostSuccess,
+		isRequestCarNum: car.isRequestCarNum,
+	}));
 
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const [isIdExist, setIdExist] = useState(false);
+	const [status, setStatus] = useState('request');
 	useEffect(() => {
 		if (modalVisible) {
-			const db = getFirestore();
-			const docRef = doc(db, 'user', carInfo.email);
-			let data;
-			console.log(carInfo.email);
-			(async () => {
-				data = await getDoc(docRef);
-				if (data.exists()) {
-					console.log('Document data:', data.data());
-					// dispatch(getCarList(carInfo.carNum.slice(-4)));
-					const id = data.data().id;
-					if (id !== '') {
+			const subscriber = firestore()
+				.collection('user')
+				.doc(email)
+				.onSnapshot((documentSnapshot) => {
+					const data = documentSnapshot.data();
+					if (data) {
+						const { id } = data;
 						dispatch(setCarId(id));
-						// dispatch(getCarInfo(id));
 						setIdExist(true);
+						console.log('work');
+						dispatch(getCarList(carInfo.carNum.slice(-4)));
 					}
-				} else {
-					// doc.data() will be undefined in this case
-					console.log('No such document!');
-				}
-			})();
-
+					console.log('User data: ', documentSnapshot.data());
+				});
 			dispatch(setCarNum(carInfo.carNum));
+			return () => subscriber();
 		}
 	}, [carInfo]);
 
@@ -100,13 +99,34 @@ export function ModalCarInfo({
 			const data = {
 				id: id,
 			};
-			const fireStore = getFirestore();
-			const washingtonRef = doc(fireStore, 'user', `${email}`);
-			(async () => {
-				await updateDoc(washingtonRef, data);
-			})();
 		}
 	}, [isCarGetSuccess, isIdExist]);
+
+	useEffect(() => {
+		if (isPostSuccess === true) {
+			setStatus('ok');
+			firestore()
+				.collection('user')
+				.doc(`${carInfo.email}`)
+				.update({
+					status: 'ok',
+				})
+				.then(() => {});
+
+			database()
+				.ref(`/postList/${carInfo.name}`)
+				.update({
+					status: 'ok',
+				})
+				.then(() => console.log('Data updated.'));
+			Alert.alert('알림', '변경사항이 저장 되었습니다', [
+				{ text: '확인', onPress: () => dispatch(makePostSuccess(false)) },
+			]);
+			(async () => {
+				sendPushNotification(carInfo.pushToken, '✅ 승인 되었습니다');
+			})();
+		}
+	}, [isPostSuccess, carInfo]);
 
 	const onPressClose = useCallback(() => {
 		setModalVisible(false);
@@ -117,27 +137,34 @@ export function ModalCarInfo({
 	// 시간 설정 로직
 	useEffect(() => {
 		const differTime = carServerInfo.differentTime.split(':');
+		const requestHour = Number(carInfo.hour);
 		const hour = Number(differTime[0]);
-		if (hour < 3) {
-			setHour('3');
-		} else if (hour < 5) {
-			setHour('5');
+		const minute = Number(differTime[1]);
+		if (requestHour === 0) {
+			if (hour < 3 && minute <= 55) setHour('3');
+			else setHour('5');
 		} else {
-			setHour(String(hour));
+			setHour(String(requestHour));
 		}
 	}, []);
 	// 성공시 fireStore 상태 변경 로직
+	console.log('h', typeof hour);
 	useEffect(() => {}, []);
 
 	const onPressConfirm = useCallback(() => {
-		let countHour = Number(hour);
-		console.log(carServerInfo.id);
-		console.log(carInfo.carNum);
 		if (hour === '3') {
 			dispatch(
 				postDiscount({
 					id: carServerInfo.id,
 					discountType: UNDER_3,
+					carNo: carInfo.carNum,
+				})
+			);
+		} else if (hour === '2') {
+			dispatch(
+				postDiscount({
+					id: carServerInfo.id,
+					discountType: UNDER_5,
 					carNo: carInfo.carNum,
 				})
 			);
@@ -157,43 +184,70 @@ export function ModalCarInfo({
 						carNo: carInfo.carNum,
 					})
 				);
-			}, 600);
-		} else {
-			dispatch(
-				postDiscount({
-					id: carServerInfo.id,
-					discountType: UNDER_3,
-					carNo: carInfo.carNum,
-				})
-			);
-			setTimeout(() => {
-				dispatch(
-					postDiscount({
-						id: carServerInfo.id,
-						discountType: UNDER_5,
-						carNo: carInfo.carNum,
-					})
-				);
-			}, 600);
-			countHour = countHour - 5;
-			while (true) {
-				setTimeout(() => {
-					dispatch(
-						postDiscount({
-							id: carServerInfo.id,
-							discountType: OVER_5,
-							carNo: carInfo.carNum,
-						})
-					);
-				}, 400);
-				countHour -= 1;
-				if (countHour < 0) break;
-			}
+			}, 1000);
 		}
 	}, [hour, carInfo, carServerInfo]);
 
+	const onPressRefused = useCallback(() => {
+		setStatus('refuse');
+		firestore()
+			.collection('user')
+			.doc(`${carInfo.email}`)
+			.update({
+				status: 'refuse',
+			})
+			.then(() => {
+				console.log('User updated! ok');
+			});
+		database()
+			.ref(`/postList/${carInfo.name}`)
+			.update({
+				status: 'refuse',
+			})
+			.then(() => console.log('Data updated.'));
+		Alert.alert('알림', '변경사항이 저장 되었습니다', [
+			{ text: '확인', onPress: () => dispatch(makePostSuccess(false)) },
+		]);
+		(async () => {
+			sendPushNotification(carInfo.pushToken, '❌ 승인이 거절 되었습니다');
+		})();
+	}, [carInfo]);
+
 	const onPressFind = useCallback(() => {
-		dispatch(getCarList(carInfo.carNum.slice(-4)));
+		console.log(carInfo.pushToken);
+		(async () => {
+			await sendPushNotification(
+				carInfo.pushToken,
+				'❌ 잘못된 차량 번호 입니다. 설정에서 차량 번호를 다시 입력해 주세요'
+			);
+		})();
+		firestore()
+			.collection('user')
+			.doc(`${carInfo.email}`)
+			.update({
+				status: 'refuse',
+			})
+			.then(() => {
+				console.log('User updated! ok');
+			});
+	}, [carInfo]);
+
+	const onPressDelete = useCallback(() => {
+		Alert.alert('알림', '정말로 삭제 하시겠어요?', [
+			{
+				text: '취소',
+				onPress: () => console.log('cancel'),
+				style: 'cancel',
+			},
+			{
+				text: '확인',
+				onPress: async () => {
+					await database().ref(`/postList/${carInfo.name}`).remove();
+					setModalVisible(false);
+				},
+				style: 'default',
+			},
+		]);
 	}, [carInfo]);
 
 	return (
@@ -202,9 +256,31 @@ export function ModalCarInfo({
 			setModalVisible={setModalVisible}
 			ModalViewRender={() => (
 				<>
-					<View style={styles.blankView} />
 					<View style={styles.modalView}>
-						<Text style={styles.titleText}>신청정보</Text>
+						<View
+							style={{
+								flexDirection: 'row',
+								justifyContent: 'flex-start',
+								alignContent: 'center',
+								alignItems: 'center',
+							}}
+						>
+							<Text style={styles.titleText}>신청정보</Text>
+
+							<TouchableHighlight
+								onPress={onPressDelete}
+								style={{ marginLeft: '45%' }}
+								underlayColor={Colors.grey100}
+							>
+								<FontAwesome5Icon
+									color={Colors.black}
+									name="trash-alt"
+									size={20}
+									style={{ padding: 15 }}
+								/>
+							</TouchableHighlight>
+						</View>
+
 						<View style={styles.rowView}>
 							<View style={styles.textWithBorderView}>
 								<Text style={styles.touchText}>이름</Text>
@@ -227,20 +303,20 @@ export function ModalCarInfo({
 							</View>
 							<View style={styles.textView}>
 								<Text style={styles.touchText}>
-									{carInfo.hour === '0'
+									{Number(carInfo.hour) === 0
 										? '바로 나가요'
-										: `${carInfo.hour} 시간 뒤에 나가요`}
+										: `${carInfo.hour} 시간`}
 								</Text>
 							</View>
 						</View>
-						{/* {!isIdExist === true && (
+						{isRequestCarNum === true && (
 							<View style={styles.rowView}>
 								<View style={styles.textWithBorderView}>
-									<Text style={styles.touchText}>서버 연동</Text>
+									<Text style={styles.touchText}>차량 번호 재입력</Text>
 								</View>
 								<View style={styles.textView}>
 									<TouchableHighlight
-										onPress={onPressFind}
+										onPress={() => console.log('hi')}
 										underlayColor={Colors.green800}
 										style={{
 											backgroundColor: Colors.green200,
@@ -249,11 +325,11 @@ export function ModalCarInfo({
 											marginLeft: '10%',
 										}}
 									>
-										<Text style={styles.touchText}> 연동하기</Text>
+										<Text style={styles.touchText}>요청하기</Text>
 									</TouchableHighlight>
 								</View>
 							</View>
-						)} */}
+						)}
 						<View style={styles.rowView}>
 							<View style={styles.textWithBorderView}>
 								<Text style={styles.touchText}>주차시간</Text>
@@ -270,7 +346,7 @@ export function ModalCarInfo({
 							</View>
 							<View style={styles.textView}>
 								<Text style={styles.touchText}>
-									{dayjs(carServerInfo.entryDate).format('HH시 mm분')}
+									{dayjs(carServerInfo.entryDate).format('A hh시 mm분')}
 								</Text>
 							</View>
 						</View>
@@ -282,13 +358,28 @@ export function ModalCarInfo({
 								<Text style={styles.touchText}>{hour}</Text>
 							</View>
 						</View>
+						<View style={styles.rowView}>
+							<View style={styles.textWithBorderView}>
+								<Text style={styles.touchText}>상태</Text>
+							</View>
+							<View style={styles.textView}>
+								<Text style={styles.touchText}>
+									{status === 'request'
+										? '대기중'
+										: status === 'ok'
+										? '승인'
+										: '거절'}
+								</Text>
+							</View>
+						</View>
 					</View>
-					<View style={styles.blankView} />
+
 					<View style={styles.buttonOverLine} />
 					<Button
 						buttonNumber={2}
 						buttonText="거절"
 						secondButtonText="승인"
+						onPressFunction={onPressRefused}
 						secondOnPressFunction={onPressConfirm}
 					/>
 				</>
@@ -304,7 +395,7 @@ const styles = StyleSheet.create({
 	},
 	modalView: {
 		height: 400,
-		backgroundColor: Colors.grey200,
+		backgroundColor: Colors.grey100,
 		width: '90%',
 		borderRadius: 8,
 	},
@@ -352,7 +443,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		fontFamily: 'NanumSquareR',
 		letterSpacing: -1,
-		marginLeft: 10,
+		// marginLeft: 10,
 		marginTop: 10,
 		marginBottom: 10,
 	},
