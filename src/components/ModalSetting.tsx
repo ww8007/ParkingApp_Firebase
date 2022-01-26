@@ -20,6 +20,7 @@ import { setUserInfo } from '../store/login';
 import car from '../store/car';
 import { useNavigation } from '@react-navigation/native';
 const screen = Dimensions.get('screen');
+const mainColor = '#00B992';
 
 interface props {
 	setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -94,7 +95,7 @@ export function ModalSetting({
 									style={styles.textInput}
 									value={carNum}
 									onChangeText={(carNum) => setCarNum((text) => carNum)}
-									placeholder="11가 1111"
+									placeholder="11가1111"
 									placeholderTextColor={Colors.grey600}
 									autoFocus={true}
 								/>
@@ -122,7 +123,7 @@ export function ModalSetting({
 					)}
 					{mode === 'loading' && (
 						<>
-							<ActivityIndicator size={30} />
+							<ActivityIndicator color={mainColor} size={30} />
 							<View style={styles.blankView} />
 							<Text style={[styles.titleText, { color: Colors.grey600 }]}>
 								로딩중
