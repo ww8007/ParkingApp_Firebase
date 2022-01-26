@@ -13,6 +13,10 @@ messaging().setBackgroundMessageHandler(async (remoteMessage) => {
 	Alert.alert('good');
 });
 
+messaging().setOpenSettingsForNotificationsHandler(async () => {
+	// Set persistent value, using the MMKV package just as an example of how you might do it
+	MMKV.setBool(openSettingsForNotifications, true);
+});
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,
 // the environment is set up appropriately
