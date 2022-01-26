@@ -4,6 +4,7 @@ export interface list {
 	today: string;
 	isCanRequest: boolean;
 	isCanSubmit: boolean;
+	isCanExtraRequest: boolean;
 }
 
 export interface addListType {
@@ -11,9 +12,11 @@ export interface addListType {
 	status: string;
 	id: number;
 	day: string;
+	postHour: string;
 }
 
 export interface addTimeType {
 	day: string;
 	time: string;
+	postHour: string;
 }
