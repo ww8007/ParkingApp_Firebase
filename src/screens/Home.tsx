@@ -68,9 +68,9 @@ export function Home() {
 		isCanRequest: list.isCanRequest,
 		isCanExtraRequest: list.isCanExtraRequest,
 	}));
-	const [checkBox, setCheckBox] = useState('1');
+	const [checkBox, setCheckBox] = useState('0');
 	const [date, setDate] = useState(dayjs().format('DD'));
-	const [postHour, setPostHour] = useState('1');
+	const [postHour, setPostHour] = useState('3');
 
 	const [superUserTokens, setTokens] = useState([]);
 
@@ -78,11 +78,6 @@ export function Home() {
 
 	const buttons = useMemo(
 		() => [
-			{
-				text: '지금 나가요',
-				checkNum: '1',
-				hour: '0',
-			},
 			{
 				text: '3시간 신청',
 				checkNum: '2',
@@ -199,8 +194,9 @@ export function Home() {
 		const time = dayjs().format('MM월 DD일 A hh시 mm분');
 		const hourTIme = dayjs().format('A hh시 mm분');
 		const day = dayjs().format('DD');
-		dispatch(addList({ time, day, postHour }));
-	}, [postHour]);
+		if (checkBox == '0') Alert.alert('선택된 시간이 없습니다');
+		else dispatch(addList({ time, day, postHour }));
+	}, [postHour, checkBox]);
 
 	useEffect(() => {
 		if (isCanSubmit) {
@@ -437,7 +433,7 @@ const styles = StyleSheet.create({
 		// justifyContent: 'flex-start',
 		width: '85%',
 		backgroundColor: Colors.grey200,
-		minHeight: 400,
+		minHeight: 350,
 		borderTopLeftRadius: 15,
 		borderTopRightRadius: 15,
 	},
