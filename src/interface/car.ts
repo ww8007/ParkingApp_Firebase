@@ -35,4 +35,5 @@ export interface carInfoState {
 	timeStamp: string;
 	name: string;
 	pushToken: string;
+	status: string;
 }
